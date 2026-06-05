@@ -1,1 +1,666 @@
-Hookes law
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate SHM Dynamics - Black & Purple</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto+Mono:wght@400;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000000; 
+            background-image: radial-gradient(circle at 50% 0%, #110822 0%, transparent 70%);
+            color: #e0d8f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #ffffff;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 30px;
+            font-family: 'Space Grotesk', sans-serif;
+            text-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            width: 100%;
+            background: #080808; 
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #2a1b40;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(168, 85, 247, 0.05);
+            flex-wrap: wrap;
+        }
+        .controls {
+            flex: 1;
+            min-width: 300px;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .visuals {
+            flex: 3;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .side-by-side {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+            flex-wrap: wrap; 
+        }
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #040404;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #1a1025;
+            box-shadow: inset 0 5px 20px rgba(0,0,0,0.8);
+            overflow-x: auto; 
+        }
+        canvas {
+            background: #000000;
+            border: 1px solid #2a1b40;
+            border-radius: 6px;
+        }
+        .control-group {
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #1a1025;
+            border-left: 3px solid #a855f7; 
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .control-group:hover { 
+            border-left-color: #d8b4fe; 
+            box-shadow: -2px 0 10px rgba(168, 85, 247, 0.2);
+        }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: #a79bbc;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            background-color: #000000;
+            color: #e0d8f0;
+            border: 1px solid #2a1b40;
+            border-radius: 6px;
+            outline: none;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.2s;
+        }
+        select:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.3);
+        }
+        input[type="range"] {
+            width: 100%;
+            margin-top: 10px;
+            accent-color: #a855f7;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            flex: 1;
+            background-color: #0a0a0a;
+            color: #a855f7;
+            border: 1px solid #a855f7;
+            padding: 12px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        button:hover { 
+            background-color: rgba(168, 85, 247, 0.15); 
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+            color: #ffffff;
+        }
+        .button-reset { color: #ec4899; border-color: #ec4899; }
+        .button-reset:hover { 
+            background-color: rgba(236, 72, 153, 0.15); 
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        .readout {
+            padding: 20px;
+            background: #0a0a0a;
+            border: 1px solid #2a1b40;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .readout div { 
+            margin: 5px 10px; 
+            font-size: 1.05em; 
+            color: #a79bbc;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .readout span {
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .highlight-type { color: #d8b4fe !important; text-shadow: 0 0 8px rgba(216, 180, 254, 0.5); }
+        .hidden { display: none !important; }
+        .slider-val { float: right; color: #a855f7; font-family: 'Roboto Mono', monospace;}
+    </style>
+</head>
+<body>
+
+    <h1>Ultimate SHM Dynamics</h1>
+
+    <div class="container">
+        <div class="controls">
+            <div class="button-group">
+                <button id="playBtn">Play / Pause</button>
+                <button id="resetBtn" class="button-reset">Reset Drop</button>
+            </div>
+
+            <div class="control-group">
+                <label>System Configuration:</label>
+                <select id="arrSelect">
+                    <option value="series">Springs (Series)</option>
+                    <option value="parallel">Springs (Parallel)</option>
+                    <option value="combined">Springs (Two-Tier)</option>
+                    <option value="pendulum">Pendulum Oscillator</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="group-n">
+                <label>Active Units: <span id="val-n" class="slider-val">1</span></label>
+                <input type="range" id="slider-n" min="1" max="5" value="1" step="1">
+            </div>
+
+            <div class="control-group hidden" id="group-top">
+                <label>Top Tier Units: <span id="val-top" class="slider-val">2</span></label>
+                <input type="range" id="slider-top" min="1" max="5" value="2" step="1">
+            </div>
+
+            <div class="control-group hidden" id="group-bot">
+                <label>Bottom Tier Units: <span id="val-bot" class="slider-val">1</span></label>
+                <input type="range" id="slider-bot" min="1" max="5" value="1" step="1">
+            </div>
+
+            <div class="control-group" id="group-k">
+                <label>Base Spring Stiffness (N/m): <span id="val-k" class="slider-val">50</span></label>
+                <input type="range" id="slider-k" min="10" max="100" value="50" step="1">
+            </div>
+
+            <div class="control-group hidden" id="group-len">
+                <label>String Length (m): <span id="val-len" class="slider-val">2.0</span></label>
+                <input type="range" id="slider-len" min="0.5" max="5.0" value="2.0" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Payload Mass (g): <span id="val-mass" class="slider-val">5000</span></label>
+                <input type="range" id="slider-mass" min="100" max="10000" value="5000" step="100">
+            </div>
+
+            <div class="control-group" id="group-amp-spring">
+                <label>Initial Amplitude (m): <span id="val-amp-spring" class="slider-val">0.5</span></label>
+                <input type="range" id="slider-amp-spring" min="0.1" max="2.0" value="0.5" step="0.1">
+            </div>
+
+            <div class="control-group hidden" id="group-amp-pend">
+                <label>Initial Angle (deg): <span id="val-amp-pend" class="slider-val">30</span></label>
+                <input type="range" id="slider-amp-pend" min="5" max="80" value="30" step="1">
+            </div>
+            
+            <div class="control-group">
+                <label>Damping Ratio (ζ): <span id="val-zeta" class="slider-val">0.10</span></label>
+                <input type="range" id="slider-zeta" min="0.0" max="2.5" value="0.1" step="0.05">
+            </div>
+        </div>
+
+        <div class="visuals">
+            <div class="readout">
+                <div><span id="lbl-stiffness" style="color: #a79bbc; font-weight: normal;">System Stiffness:</span> <span id="out-overall-k">50.00 N/m</span></div>
+                <div>Oscillation Period: <span id="out-period">0.00</span> s</div>
+                <div>Damping State: <span id="out-type" class="highlight-type">Underdamped</span></div>
+            </div>
+
+            <div class="side-by-side">
+                <div class="canvas-container" style="flex: 1;">
+                    <canvas id="simCanvas" width="300" height="500"></canvas>
+                </div>
+                <div class="canvas-container" style="flex: 2;">
+                    <canvas id="graphCanvas" width="600" height="500"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const arrSelect = document.getElementById('arrSelect');
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const simCanvas = document.getElementById('simCanvas');
+        const simCtx = simCanvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+
+        const sliders = {
+            n: document.getElementById('slider-n'),
+            top: document.getElementById('slider-top'),
+            bot: document.getElementById('slider-bot'),
+            k: document.getElementById('slider-k'),
+            len: document.getElementById('slider-len'),
+            mass: document.getElementById('slider-mass'),
+            ampSpring: document.getElementById('slider-amp-spring'),
+            ampPend: document.getElementById('slider-amp-pend'),
+            zeta: document.getElementById('slider-zeta')
+        };
+
+        const groups = {
+            n: document.getElementById('group-n'),
+            top: document.getElementById('group-top'),
+            bot: document.getElementById('group-bot'),
+            k: document.getElementById('group-k'),
+            len: document.getElementById('group-len'),
+            ampSpring: document.getElementById('group-amp-spring'),
+            ampPend: document.getElementById('group-amp-pend')
+        };
+
+        const vals = {
+            n: document.getElementById('val-n'),
+            top: document.getElementById('val-top'),
+            bot: document.getElementById('val-bot'),
+            k: document.getElementById('val-k'),
+            len: document.getElementById('val-len'),
+            mass: document.getElementById('val-mass'),
+            ampSpring: document.getElementById('val-amp-spring'),
+            ampPend: document.getElementById('val-amp-pend'),
+            zeta: document.getElementById('val-zeta')
+        };
+
+        const outputs = {
+            lblStiffness: document.getElementById('lbl-stiffness'),
+            overallK: document.getElementById('out-overall-k'),
+            period: document.getElementById('out-period'),
+            type: document.getElementById('out-type')
+        };
+
+        const g = 9.81;
+        const pixelsPerMeter = 30; 
+        const baseSpringLength = 40; 
+        
+        let isPlaying = false;
+        let lastTimestamp = performance.now();
+        let history = []; 
+        const maxHistory = 400; 
+        
+        let currentDisplacement = 0; 
+        let currentVelocity = 0;
+        let currentAcceleration = 0;
+
+        const colorPrimary = '#a855f7'; 
+        const colorSecondary = '#d8b4fe'; 
+        const colorTertiary = '#ec4899'; 
+
+        function resetSimulation() {
+            const arr = arrSelect.value;
+            if (arr === 'pendulum') {
+                let degrees = parseFloat(sliders.ampPend.value);
+                currentDisplacement = degrees * (Math.PI / 180);
+            } else {
+                currentDisplacement = parseFloat(sliders.ampSpring.value);
+            }
+            
+            currentVelocity = 0;
+            currentAcceleration = 0;
+            history = [];
+            lastTimestamp = performance.now();
+            drawFrame(0);
+        }
+
+        function updateUI() {
+            const arr = arrSelect.value;
+            
+            Object.values(groups).forEach(g => g.classList.add('hidden'));
+
+            if (arr === 'pendulum') {
+                groups.len.classList.remove('hidden');
+                groups.ampPend.classList.remove('hidden');
+                outputs.lblStiffness.textContent = "String Length:";
+            } else {
+                groups.k.classList.remove('hidden');
+                groups.ampSpring.classList.remove('hidden');
+                outputs.lblStiffness.textContent = "System Stiffness:";
+                
+                if (arr === 'combined') {
+                    groups.top.classList.remove('hidden');
+                    groups.bot.classList.remove('hidden');
+                } else {
+                    groups.n.classList.remove('hidden');
+                }
+            }
+
+            Object.keys(sliders).forEach(key => {
+                if(vals[key]) {
+                    if(key === 'zeta') vals[key].textContent = parseFloat(sliders[key].value).toFixed(2);
+                    else vals[key].textContent = sliders[key].value;
+                }
+            });
+
+            let z = parseFloat(sliders.zeta.value);
+            if (z === 0) outputs.type.textContent = "UNDAMPED";
+            else if (z < 1) outputs.type.textContent = "UNDERDAMPED";
+            else if (Math.abs(z - 1) < 0.01) outputs.type.textContent = "CRITICALLY DAMPED";
+            else outputs.type.textContent = "OVERDAMPED";
+
+            resetSimulation();
+        }
+
+        function drawZigZag(ctx, startX, startY, endX, endY, loops, width) {
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            let distance = endY - startY;
+            let segmentHeight = distance / (loops * 2);
+            for (let i = 0; i < loops; i++) {
+                ctx.lineTo(startX + width/2, startY + segmentHeight * (i * 2 + 0.5));
+                ctx.lineTo(startX - width/2, startY + segmentHeight * (i * 2 + 1.5));
+            }
+            ctx.lineTo(endX, endY);
+            
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = 'rgba(168, 85, 247, 0.5)';
+            ctx.strokeStyle = colorPrimary;
+            ctx.lineWidth = 1.5; 
+            ctx.stroke();
+            ctx.shadowBlur = 0; 
+        }
+
+        function drawSquareMass(ctx, x, y) {
+            ctx.fillStyle = 'rgba(236, 72, 153, 0.15)'; 
+            ctx.beginPath();
+            ctx.rect(x - 15, y, 30, 30); 
+            ctx.fill();
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(236, 72, 153, 0.5)';
+            ctx.strokeStyle = colorTertiary;
+            ctx.lineWidth = 1.5; 
+            ctx.stroke();
+            ctx.shadowBlur = 0; 
+        }
+
+        function drawRoundMass(ctx, x, y) {
+            ctx.fillStyle = 'rgba(236, 72, 153, 0.15)'; 
+            ctx.beginPath();
+            ctx.arc(x, y, 16, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(236, 72, 153, 0.5)';
+            ctx.strokeStyle = colorTertiary;
+            ctx.lineWidth = 1.5; 
+            ctx.stroke();
+            ctx.shadowBlur = 0; 
+        }
+
+        function drawGrid(ctx, width, height) {
+            ctx.strokeStyle = '#150a22'; 
+            ctx.lineWidth = 1;
+            for(let x=0; x<width; x+=25) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+            }
+            for(let y=0; y<height; y+=height/6) { 
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+            }
+        }
+
+        function drawGraph(ctx, dataKey, color, label, yOffset, height, scale) {
+            ctx.strokeStyle = '#2a1b40';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, yOffset + height/2);
+            ctx.lineTo(ctx.canvas.width, yOffset + height/2);
+            ctx.stroke();
+
+            ctx.strokeStyle = color;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = color;
+            ctx.lineWidth = 1.2; 
+            ctx.beginPath();
+            
+            for(let i = 0; i < history.length; i++) {
+                let x = (i / maxHistory) * ctx.canvas.width;
+                let y = (yOffset + height/2) - (history[i][dataKey] * scale); 
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0; 
+
+            ctx.fillStyle = color;
+            ctx.font = '12px "Roboto Mono", monospace';
+            ctx.fillText(label, 10, yOffset + 20);
+        }
+
+        function drawFrame(deltaTime) {
+            const arr = arrSelect.value;
+            let massKg = parseFloat(sliders.mass.value) / 1000;
+            let zeta = parseFloat(sliders.zeta.value);
+            
+            let omega_n = 0;
+            let kEff = 0;
+            let L = 0;
+
+            if (arr === 'pendulum') {
+                L = parseFloat(sliders.len.value);
+                omega_n = Math.sqrt(g / L);
+                outputs.overallK.textContent = L.toFixed(2) + " m";
+            } else {
+                let n = parseInt(sliders.n.value);
+                let nTop = parseInt(sliders.top.value);
+                let nBot = parseInt(sliders.bot.value);
+                let k = parseFloat(sliders.k.value);
+                
+                let multiplier = 0;
+                if (arr === 'series') multiplier = 1 / n;
+                else if (arr === 'parallel') multiplier = n;
+                else if (arr === 'combined') multiplier = (nTop * nBot) / (nTop + nBot);
+
+                kEff = k * multiplier;
+                omega_n = Math.sqrt(kEff / massKg);
+                outputs.overallK.textContent = kEff.toFixed(2) + " N/m";
+            }
+
+            let period = (2 * Math.PI) / omega_n;
+            outputs.period.textContent = period.toFixed(2);
+
+            if (isPlaying && deltaTime > 0) {
+                let subSteps = 10; 
+                let dt = deltaTime / subSteps;
+                for(let i=0; i<subSteps; i++) {
+                    currentAcceleration = -(omega_n * omega_n) * currentDisplacement - (2 * zeta * omega_n) * currentVelocity;
+                    currentVelocity += currentAcceleration * dt;
+                    currentDisplacement += currentVelocity * dt;
+                }
+            } else if (history.length === 0) {
+                 currentAcceleration = -(omega_n * omega_n) * currentDisplacement - (2 * zeta * omega_n) * currentVelocity;
+            }
+
+            if (isPlaying) {
+                history.push({ d: currentDisplacement, v: currentVelocity, a: currentAcceleration });
+                if (history.length > maxHistory) history.shift();
+            } else if (history.length === 0) {
+                 history.push({ d: currentDisplacement, v: currentVelocity, a: currentAcceleration });
+            }
+
+            // --- DRAW SIMULATION CANVAS ---
+            simCtx.clearRect(0, 0, simCanvas.width, simCanvas.height);
+            simCtx.fillStyle = '#0a0a0a';
+            simCtx.fillRect(0, 0, simCanvas.width, 20);
+            simCtx.strokeStyle = '#2a1b40';
+            simCtx.lineWidth = 2;
+            simCtx.strokeRect(0, 0, simCanvas.width, 20);
+
+            const centerX = simCanvas.width / 2;
+            let currentY = 20;
+
+            if (arr === 'pendulum') {
+                let lengthPx = L * 60; 
+                let bobX = centerX + lengthPx * Math.sin(currentDisplacement);
+                let bobY = currentY + lengthPx * Math.cos(currentDisplacement);
+
+                simCtx.shadowBlur = 6; simCtx.shadowColor = 'rgba(168, 85, 247, 0.5)';
+                simCtx.strokeStyle = colorPrimary;
+                simCtx.lineWidth = 2;
+                simCtx.beginPath();
+                simCtx.moveTo(centerX, currentY);
+                simCtx.lineTo(bobX, bobY);
+                simCtx.stroke();
+                simCtx.shadowBlur = 0;
+
+                drawRoundMass(simCtx, bobX, bobY);
+
+            } else {
+                let eqStretch = (massKg * g) / kEff;
+                let totalCurrentStretch = eqStretch + currentDisplacement;
+                let springLoops = 16;
+                let springWidth = 14;
+                let n = parseInt(sliders.n.value);
+
+                if (arr === 'series') {
+                    let segmentStretch = (totalCurrentStretch * pixelsPerMeter) / n;
+                    for (let i = 0; i < n; i++) {
+                        let nextY = currentY + baseSpringLength + segmentStretch;
+                        drawZigZag(simCtx, centerX, currentY, centerX, nextY, springLoops, springWidth);
+                        currentY = nextY;
+                    }
+                    drawSquareMass(simCtx, centerX, currentY);
+                } else if (arr === 'parallel') {
+                    let visualStretch = totalCurrentStretch * pixelsPerMeter;
+                    let bottomY = currentY + baseSpringLength + visualStretch;
+                    let spacing = 35;
+                    let startX = centerX - ((n - 1) * spacing) / 2;
+                    
+                    for(let i=0; i < n; i++) {
+                        drawZigZag(simCtx, startX + (i*spacing), currentY, startX + (i*spacing), bottomY, springLoops, springWidth);
+                    }
+                    
+                    simCtx.shadowBlur = 6; simCtx.shadowColor = 'rgba(168, 85, 247, 0.5)';
+                    simCtx.strokeStyle = colorPrimary;
+                    simCtx.beginPath();
+                    simCtx.moveTo(startX - 15, bottomY);
+                    simCtx.lineTo(startX + ((n-1)*spacing) + 15, bottomY);
+                    simCtx.lineWidth = 2; 
+                    simCtx.stroke();
+                    simCtx.shadowBlur = 0;
+
+                    drawSquareMass(simCtx, centerX, bottomY);
+                } else if (arr === 'combined') {
+                    let k = parseFloat(sliders.k.value);
+                    let nTop = parseInt(sliders.top.value);
+                    let nBot = parseInt(sliders.bot.value);
+                    let spacing = 35;
+                    let proportionTop = (1/ (nTop * k)) / (1/kEff);
+                    let proportionBot = (1/ (nBot * k)) / (1/kEff);
+                    
+                    let stretchTop = totalCurrentStretch * proportionTop;
+                    let stretchBot = totalCurrentStretch * proportionBot;
+
+                    let midY = currentY + baseSpringLength + (stretchTop * pixelsPerMeter);
+                    let startXTop = centerX - ((nTop - 1) * spacing) / 2;
+                    
+                    for(let i=0; i < nTop; i++) {
+                        drawZigZag(simCtx, startXTop + (i*spacing), currentY, startXTop + (i*spacing), midY, springLoops, springWidth);
+                    }
+                    
+                    simCtx.shadowBlur = 6; simCtx.shadowColor = 'rgba(168, 85, 247, 0.5)'; simCtx.strokeStyle = colorPrimary;
+                    simCtx.beginPath(); simCtx.moveTo(centerX - 60, midY); simCtx.lineTo(centerX + 60, midY);
+                    simCtx.lineWidth = 2; simCtx.stroke(); simCtx.shadowBlur = 0;
+
+                    let bottomY = midY + baseSpringLength + (stretchBot * pixelsPerMeter);
+                    let startXBot = centerX - ((nBot - 1) * spacing) / 2;
+                    
+                    for(let i=0; i < nBot; i++) {
+                        drawZigZag(simCtx, startXBot + (i*spacing), midY, startXBot + (i*spacing), bottomY, springLoops, springWidth);
+                    }
+                    
+                    simCtx.shadowBlur = 6; simCtx.shadowColor = 'rgba(168, 85, 247, 0.5)'; simCtx.strokeStyle = colorPrimary;
+                    simCtx.beginPath(); simCtx.moveTo(centerX - 60, bottomY); simCtx.lineTo(centerX + 60, bottomY);
+                    simCtx.lineWidth = 2; simCtx.stroke(); simCtx.shadowBlur = 0;
+                    
+                    drawSquareMass(simCtx, centerX, bottomY);
+                }
+            }
+
+            // --- DRAW GRAPH CANVAS ---
+            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            drawGrid(graphCtx, graphCanvas.width, graphCanvas.height);
+
+            let sectionHeight = graphCanvas.height / 3;
+            
+            let ampRaw = arr === 'pendulum' ? parseFloat(sliders.ampPend.value) * (Math.PI/180) : parseFloat(sliders.ampSpring.value);
+            
+            let dScale = (sectionHeight / 2.5) / ampRaw; 
+            let vScale = (sectionHeight / 2.5) / (ampRaw * omega_n);
+            let aScale = (sectionHeight / 2.5) / (ampRaw * omega_n * omega_n);
+
+            let lblD = arr === 'pendulum' ? 'ANGLE (rad)' : 'DISPLACEMENT (m)';
+            let lblV = arr === 'pendulum' ? 'ANG. VELOCITY (rad/s)' : 'VELOCITY (m/s)';
+            let lblA = arr === 'pendulum' ? 'ANG. ACCELERATION (rad/s²)' : 'ACCELERATION (m/s²)';
+
+            drawGraph(graphCtx, 'd', colorPrimary, lblD, 0, sectionHeight, dScale); 
+            drawGraph(graphCtx, 'v', colorSecondary, lblV, sectionHeight, sectionHeight, vScale); 
+            drawGraph(graphCtx, 'a', colorTertiary, lblA, sectionHeight * 2, sectionHeight, aScale); 
+        }
+
+        function loop(timestamp) {
+            let deltaTime = (timestamp - lastTimestamp) / 1000; 
+            lastTimestamp = timestamp;
+            if (deltaTime > 0.1) deltaTime = 0.1; 
+
+            drawFrame(deltaTime);
+            requestAnimationFrame(loop);
+        }
+
+        arrSelect.addEventListener('change', updateUI);
+        Object.values(sliders).forEach(slider => {
+            slider.addEventListener('input', updateUI);
+        });
+
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if(isPlaying) lastTimestamp = performance.now();
+        });
+        
+        resetBtn.addEventListener('click', resetSimulation);
+
+        // Initialize immediately
+        updateUI();
+        requestAnimationFrame(loop);
+
+    </script>
+</body>
+</html>
